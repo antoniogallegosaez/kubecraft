@@ -11,9 +11,7 @@
 [Org]
 	[Org."Core maintainers"]
 		people = [
-			"aduermael",
-			"davetucker",
-			"gdevillele",
+			"eformat",
 		]
 
 [people]
@@ -24,17 +22,7 @@
 
 	# ADD YOURSELF HERE IN ALPHABETICAL ORDER
 
-	[people.aduermael]
-	Name = "Adrien Duermael"
-	Email = "adrien@docker.com"
-	GitHub = "aduermael"
-
-	[people.davetucker]
-	Name = "Dave Tucker"
-	Email = "dave.tucker@docker.com"
-	GitHub = "dave-tucker"
-
-	[people.gdevillele]
-	Name = "Gaetan de Villele"
-	Email = "gaetan@docker.com"
-	GitHub = "gdevillele"
+	[people.eformat]
+	Name = "eformat"
+	Email = "eformat@gmail.com"
+	GitHub = "eformat"

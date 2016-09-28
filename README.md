@@ -64,5 +64,5 @@ See the original readme for details on upstream.
 	```
 	localhost:25565
 	```
-
 	
+	![alt text](https://github.com/eformat/kubecraft/raw/master/docs/img/kubecraft.png "Kubecraft Client")

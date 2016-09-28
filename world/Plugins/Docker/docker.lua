@@ -36,7 +36,7 @@ function Initialize(Plugin)
 
 	-- Command Bindings
 
-	cPluginManager.BindCommand("/kubectl", "*", DockerCommand, " - docker CLI commands")
+	cPluginManager.BindCommand("/oc", "*", DockerCommand, " - Openshift CLI commands")
 
 	Plugin:AddWebTab("Docker",HandleRequest_Docker)
 
@@ -232,8 +232,9 @@ function PlayerUsingBlock(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, Cu
 	if BlockType == 77
 	then
 		containerID, running = getRemoveButtonContainer(BlockX,BlockZ)
-			Player:SendMessage("kubectl delete po " .. containerID)
-			os.execute("goproxy exec?cmd=kubectl+delete+po+" .. containerID .. "+--kubeconfig=/etc/kubeconfig")
+			Player:SendMessage("oc delete pod " .. containerID)
+			-- os.execute("goproxy exec?cmd=oc+delete+pod+" .. containerID) -- .. "+--kubeconfig=/etc/kubeconfig")
+			os.execute("goproxy exec?cmd=oc+delete+pod+" .. containerID .. "+-n=" .. os.getenv("NAMESPACE"))
 	end
 end
 
@@ -256,7 +257,7 @@ function DockerCommand(Split, Player)
 
 		LOG("Split[1]: " .. Split[1])
 
-		if Split[1] == "/kubectl"
+		if Split[1] == "/oc"
 		then
 			if table.getn(Split) > 1
 			then
@@ -264,7 +265,8 @@ function DockerCommand(Split, Player)
 					-- remove '/' at the beginning
 					command = string.sub(EntireCommand, 2, -1)
 
-					r = os.execute("goproxy exec?cmd=" .. command ..  "+--kubeconfig=/etc/kubeconfig")
+					-- r = os.execute("goproxy exec?cmd=" .. command) -- ..  "+--kubeconfig=/etc/kubeconfig")
+					r = os.execute("goproxy exec?cmd=" .. command .. "+-n=" .. os.getenv("NAMESPACE"))
 
 					LOG("executed: " .. command .. " -> " .. tostring(r))
 
@@ -390,7 +392,7 @@ end
 
 function OnServerPing(ClientHandle, ServerDescription, OnlinePlayers, MaxPlayers, Favicon)
 	-- Change Server Description
-	ServerDescription = "A Docker client for Minecraft"
+	ServerDescription = "Openshift client for Minecraft"
 	-- Change favicon
 	if cFile:IsFile("/srv/logo.png") then
 		local FaviconData = cFile:ReadWholeFile("/srv/logo.png")

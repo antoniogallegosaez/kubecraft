@@ -63,7 +63,7 @@ function ShowPage(WebAdmin, TemplateRequest)
 	local PluginPage = WebAdmin:GetPage(TemplateRequest.Request)
 	local PageContent = PluginPage.Content
 	local SubTitle = PluginPage.PluginName
-	if (PluginPage.TabName ~= "") then
+	if (not PluginPage.TabName and PluginPage.TabName ~= "") then
 		SubTitle = PluginPage.PluginName .. " - " .. PluginPage.TabName
 	end
 	if (PageContent == "") then

@@ -17,7 +17,6 @@ import (
 	"k8s.io/kubernetes/pkg/client/restclient"
 	kclient "k8s.io/kubernetes/pkg/client/unversioned"
 	kclientcmd "k8s.io/kubernetes/pkg/client/unversioned/clientcmd"
-	kframework "k8s.io/kubernetes/pkg/controller/framework"
 	kselector "k8s.io/kubernetes/pkg/fields"
 	"k8s.io/kubernetes/pkg/util/wait"
 )
@@ -39,12 +38,13 @@ import (
 var (
 	argKubecfgFile   = flag.String("kubecfg-file", "", "Location of kubecfg file for access to kubernetes master service; --kube_master_url overrides the URL part of this; if neither this nor --kube_master_url are provided, defaults to service account tokens")
 	argKubeMasterURL = flag.String("kube-master-url", "", "URL to reach kubernetes master. Env variables in this flag will be expanded.")
+	argKubeNamespace = flag.String("kube-namespace", "", "Kube Namepsace. Env variables in this flag will be expanded.")
 	client           *kclient.Client
 )
 
 const (
 	// Resync period for the kube controller loop.
-	resyncPeriod = 30 * time.Minute
+	resyncPeriod = 5 * time.Second
 )
 
 // CPUStats Information
@@ -121,7 +121,7 @@ func newKubeClient() (*kclient.Client, error) {
 		masterURL string
 	)
 
-	*argKubecfgFile = os.Getenv("KUBE_CFG_FILE")
+	*argKubecfgFile = os.Getenv("KUBECONFIG")
 
 	logrus.Print("kubeconfig: ", argKubecfgFile)
 
@@ -156,11 +156,11 @@ func createEndpointsPodLW(kubeClient *kclient.Client) *kcache.ListWatch {
 }
 
 func watchPods(kubeClient *kclient.Client) kcache.Store {
-	eStore, eController := kframework.NewInformer(
+	eStore, eController := kcache.NewInformer(
 		createEndpointsPodLW(kubeClient),
 		&kapi.Pod{},
 		resyncPeriod,
-		kframework.ResourceEventHandlerFuncs{
+		kcache.ResourceEventHandlerFuncs{
 			AddFunc: handlePodCreate,
 			UpdateFunc: func(oldObj, newObj interface{}) {
 				handlePodUpdate(oldObj, newObj)
@@ -378,8 +378,13 @@ func listContainers(w http.ResponseWriter, r *http.Request) {
 	// answer right away to avoid dead locks in LUA
 	io.WriteString(w, "OK")
 
+	*argKubeNamespace = os.Getenv("NAMESPACE")
+	//	if *argKubeNamespace == "" {
+	//		*argKubeNamespace = "default"
+	//	}
+
 	go func() {
-		pods, err := client.Pods("default").List(kapi.ListOptions{})
+		pods, err := client.Pods(*argKubeNamespace).List(kapi.ListOptions{})
 
 		logrus.Print("made pods request")
 
